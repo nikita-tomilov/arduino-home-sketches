@@ -1,9 +1,3 @@
-#include <OneWire.h>
-OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
-
-byte ds_outside_addr[] = {0x28, 0xFF, 0x86, 0x29, 0xC3, 0x16, 0x03, 0xEF};
-byte ds_inside_addr[]  = {0x28, 0xFF, 0xEE, 0xAD, 0x53, 0x17, 0x04, 0x78};
-
 void find_ds_sensors() {
     byte addr[8];
     while (ds.search(addr)) {
@@ -77,37 +71,4 @@ float get_ds_temp(byte* addr) {
     celsius = (float)raw / 16.0;
     fahrenheit = celsius * 1.8 + 32.0;
     return celsius;
-}
-
-float temp_inside = 0;
-float temp_outside = 0;
-bool setup_ds_done = false;
-long last_temp_scan = -3000;
-
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  if ((!setup_ds_done) && ((millis() - last_temp_scan) > 3000)) {
-            setup_ds_temp(ds_inside_addr);
-            setup_ds_temp(ds_outside_addr);
-            setup_ds_done = true;
-            last_temp_scan = millis();
-        } else if ((setup_ds_done) && ((millis() - last_temp_scan) > 1000)) {
-            temp_inside = get_ds_temp(ds_inside_addr);
-            temp_outside = get_ds_temp(ds_outside_addr);
-            setup_ds_done = false;
-            last_temp_scan = millis();
-            Serial.print("I");
-            Serial.println(temp_inside);
-            Serial.print("O");
-            Serial.println(temp_outside);
-        }
-//   if (Serial.available()) {
-//      char c = Serial.read();
-      
-//   }
 }
